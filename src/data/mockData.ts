@@ -1,4 +1,5 @@
-import { Product, Workflow, DashboardStats, Country } from '../types';
+import { Product, Workflow, DashboardStats, Country, Dossier, DossierSection } from '../types';
+import { DOSSIER_SECTIONS } from '../utils/constants';
 
 export const mockProducts: Product[] = [
   {
@@ -277,11 +278,88 @@ export const mockWorkflows: Workflow[] = [
   }
 ];
 
+// Helper function to create dossier sections
+const createDossierSections = (dossierId: string): DossierSection[] => {
+  return DOSSIER_SECTIONS.map((section, index) => ({
+    id: `${dossierId}-section-${index + 1}`,
+    dossierId,
+    sectionNumber: section.number,
+    sectionName: section.name,
+    description: section.description,
+    status: Math.random() > 0.3 ? 'completed' : Math.random() > 0.5 ? 'in_progress' : 'pending',
+    documents: [],
+    completedAt: Math.random() > 0.3 ? new Date().toISOString() : undefined,
+    notes: Math.random() > 0.7 ? 'Sección completada satisfactoriamente' : undefined
+  }));
+};
+
+export const mockDossiers: Dossier[] = [
+  {
+    id: 'dossier-1',
+    productId: '1',
+    productName: 'Paracetamol Plus 500mg',
+    manufacturerId: 'mfg-1',
+    manufacturerName: 'Laboratorios Farmex S.A.',
+    countryCode: 'CR',
+    countryName: 'Costa Rica',
+    status: 'approved',
+    completionPercentage: 100,
+    createdAt: '2024-01-10T08:00:00Z',
+    updatedAt: '2024-01-20T14:30:00Z',
+    sections: createDossierSections('dossier-1').map(s => ({ ...s, status: 'completed' as const })),
+    workflowId: 'wf-1'
+  },
+  {
+    id: 'dossier-2',
+    productId: '1',
+    productName: 'Paracetamol Plus 500mg',
+    manufacturerId: 'mfg-1',
+    manufacturerName: 'Laboratorios Farmex S.A.',
+    countryCode: 'GT',
+    countryName: 'Guatemala',
+    status: 'in_progress',
+    completionPercentage: 75,
+    createdAt: '2024-02-01T10:00:00Z',
+    updatedAt: '2024-02-15T16:00:00Z',
+    sections: createDossierSections('dossier-2')
+  },
+  {
+    id: 'dossier-3',
+    productId: '2',
+    productName: 'Amoxicilina 875mg',
+    manufacturerId: 'mfg-2',
+    manufacturerName: 'Biotech Pharmaceuticals Ltd.',
+    countryCode: 'CR',
+    countryName: 'Costa Rica',
+    status: 'draft',
+    completionPercentage: 25,
+    createdAt: '2024-02-10T09:00:00Z',
+    updatedAt: '2024-02-20T11:30:00Z',
+    sections: createDossierSections('dossier-3')
+  },
+  {
+    id: 'dossier-4',
+    productId: '1',
+    productName: 'Paracetamol Plus 500mg',
+    manufacturerId: 'mfg-2',
+    manufacturerName: 'Biotech Pharmaceuticals Ltd.',
+    countryCode: 'PA',
+    countryName: 'Panamá',
+    status: 'submitted',
+    completionPercentage: 90,
+    createdAt: '2024-01-20T14:00:00Z',
+    updatedAt: '2024-02-05T12:00:00Z',
+    sections: createDossierSections('dossier-4')
+  }
+];
+
 export const mockDashboardStats: DashboardStats = {
   totalProducts: 23,
   activeRegistrations: 45,
   pendingWorkflows: 8,
   expiringRegistrations: 3,
+  totalDossiers: 42,
+  completedDossiers: 18,
   workflowDistribution: [
     { name: 'Registros', value: 12, color: '#2563EB' },
     { name: 'Renovaciones', value: 6, color: '#059669' },
@@ -305,6 +383,12 @@ export const mockDashboardStats: DashboardStats = {
     { month: 'Ago', registrations: 9, renewals: 2 },
     { month: 'Sep', registrations: 6, renewals: 3 },
     { month: 'Oct', registrations: 3, renewals: 6 }
+  ],
+  dossierProgress: [
+    { country: 'Costa Rica', completed: 8, total: 12, percentage: 67 },
+    { country: 'Guatemala', completed: 5, total: 8, percentage: 63 },
+    { country: 'Panamá', completed: 3, total: 6, percentage: 50 },
+    { country: 'El Salvador', completed: 2, total: 4, percentage: 50 }
   ]
 };
 

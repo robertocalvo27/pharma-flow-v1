@@ -6,9 +6,10 @@ import { Select } from '../components/ui/Select';
 import { Modal } from '../components/ui/Modal';
 import { ProductsTable } from '../components/products/ProductsTable';
 import { ProductForm } from '../components/products/ProductForm';
+import { DossiersModal } from '../components/products/DossiersModal';
 import { useStore } from '../store';
-import { Product } from '../types';
-import { mockProducts } from '../data/mockData';
+import { Product, Dossier } from '../types';
+import { mockProducts, mockDossiers } from '../data/mockData';
 
 export const Products: React.FC = () => {
   const { products, setProducts, addProduct, updateProduct, deleteProduct } = useStore();
@@ -16,13 +17,18 @@ export const Products: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDossiersModalOpen, setIsDossiersModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [dossiers, setDossiers] = useState<Dossier[]>([]);
   
   useEffect(() => {
     if (products.length === 0) {
       setProducts(mockProducts);
     }
-  }, [products.length, setProducts]);
+    if (dossiers.length === 0) {
+      setDossiers(mockDossiers);
+    }
+  }, [products.length, dossiers.length, setProducts]);
   
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,6 +70,23 @@ export const Products: React.FC = () => {
     // TODO: Implement product view modal or navigate to product detail page
     console.log('View product:', product);
   };
+
+  const handleViewDossiers = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDossiersModalOpen(true);
+  };
+
+  const handleCreateDossier = (productId: string, manufacturerId: string, countryCode: string) => {
+    // TODO: Implement create dossier functionality
+    console.log('Create dossier for product:', productId, manufacturerId, countryCode);
+    alert('Funcionalidad de crear dossier pendiente de implementar');
+  };
+
+  const handleViewDossier = (dossier: Dossier) => {
+    // TODO: Implement view dossier detail functionality
+    console.log('View dossier details:', dossier);
+    alert(`Ver detalles del dossier ${dossier.countryName} - ${dossier.manufacturerName}`);
+  };
   
   const handleEditClick = (product: Product) => {
     setSelectedProduct(product);
@@ -95,14 +118,13 @@ export const Products: React.FC = () => {
             placeholder="Buscar productos..."
             icon={Search}
             value={searchTerm}
-            onChange={setSearchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="w-full sm:w-48">
           <Select
-            placeholder="Filtrar por estado"
             value={statusFilter}
-            onChange={setStatusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
             options={statusOptions}
           />
         </div>
@@ -117,6 +139,7 @@ export const Products: React.FC = () => {
         onView={handleViewProduct}
         onEdit={handleEditClick}
         onDelete={handleDeleteProduct}
+        onViewDossiers={handleViewDossiers}
       />
       
       {/* Create Product Modal */}
@@ -153,6 +176,21 @@ export const Products: React.FC = () => {
           />
         )}
       </Modal>
+
+      {/* Dossiers Modal */}
+      {selectedProduct && (
+        <DossiersModal
+          isOpen={isDossiersModalOpen}
+          onClose={() => {
+            setIsDossiersModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          product={selectedProduct}
+          dossiers={dossiers.filter(d => d.productId === selectedProduct.id)}
+          onCreateDossier={handleCreateDossier}
+          onViewDossier={handleViewDossier}
+        />
+      )}
     </div>
   );
 };

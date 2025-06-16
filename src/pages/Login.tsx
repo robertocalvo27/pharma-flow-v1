@@ -11,7 +11,11 @@ interface LoginFormData {
   rememberMe: boolean;
 }
 
-export const Login: React.FC = () => {
+interface LoginProps {
+  onLogin: () => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -22,8 +26,15 @@ export const Login: React.FC = () => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
     console.log('Login attempt:', data);
+    
+    // Mock authentication - accept any valid email and password with 6+ characters
+    if (data.email && data.password && data.password.length >= 6) {
+      onLogin(); // Successfully authenticate
+    } else {
+      alert('Por favor ingresa un email válido y una contraseña de al menos 6 caracteres');
+    }
+    
     setIsLoading(false);
-    // TODO: Implement actual authentication
   };
   
   const features = [

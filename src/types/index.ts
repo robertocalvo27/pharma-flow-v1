@@ -72,12 +72,70 @@ export interface Country {
   isActive: boolean;
 }
 
+export interface Dossier {
+  id: string;
+  productId: string;
+  productName: string;
+  manufacturerId: string;
+  manufacturerName: string;
+  countryCode: string;
+  countryName: string;
+  status: 'draft' | 'in_progress' | 'completed' | 'submitted' | 'approved' | 'rejected';
+  completionPercentage: number;
+  createdAt: string;
+  updatedAt: string;
+  sections: DossierSection[];
+  workflowId?: string;
+}
+
+export interface DossierSection {
+  id: string;
+  dossierId: string;
+  sectionNumber: number;
+  sectionName: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected';
+  documents: DossierDocument[];
+  completedAt?: string;
+  notes?: string;
+}
+
+export interface DossierDocument {
+  id: string;
+  sectionId: string;
+  dossierId: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  filePath: string;
+  version: number;
+  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+  uploadedBy: string;
+  uploadedByName: string;
+  uploadedAt: string;
+  notes?: string;
+}
+
+export interface Manufacturer {
+  id: string;
+  name: string;
+  country: string;
+  address: string;
+  contactEmail: string;
+  certifications: string[];
+  isActive: boolean;
+  createdAt: string;
+}
+
 export interface DashboardStats {
   totalProducts: number;
   activeRegistrations: number;
   pendingWorkflows: number;
   expiringRegistrations: number;
+  totalDossiers: number;
+  completedDossiers: number;
   workflowDistribution: { name: string; value: number; color: string }[];
   statusDistribution: { name: string; value: number; color: string }[];
   monthlyRegistrations: { month: string; registrations: number; renewals: number }[];
+  dossierProgress: { country: string; completed: number; total: number; percentage: number }[];
 }

@@ -14,10 +14,10 @@ import { Settings } from './pages/Settings';
 function App() {
   // For demo purposes, we'll show the login page
   // In a real app, you'd have authentication state management
-  const isAuthenticated = false;
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   
   if (!isAuthenticated) {
-    return <Login />;
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
   }
   
   return (
