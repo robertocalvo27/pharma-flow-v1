@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
+import { TrialBanner } from './components/trial/TrialBanner';
 import { Layout } from './components/layout/Layout';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -27,6 +29,7 @@ function App() {
           <Route path="/" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Dashboard />
               </Layout>
             </ProtectedRoute>
@@ -35,6 +38,7 @@ function App() {
           <Route path="/products" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Products />
               </Layout>
             </ProtectedRoute>
@@ -43,6 +47,7 @@ function App() {
           <Route path="/workflows" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Workflows />
               </Layout>
             </ProtectedRoute>
@@ -51,6 +56,7 @@ function App() {
           <Route path="/registrations" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Registrations />
               </Layout>
             </ProtectedRoute>
@@ -59,6 +65,7 @@ function App() {
           <Route path="/reports" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Reports />
               </Layout>
             </ProtectedRoute>
@@ -67,6 +74,7 @@ function App() {
           <Route path="/users" element={
             <ProtectedRoute requiredRole="manager">
               <Layout>
+                <TrialBanner />
                 <Users />
               </Layout>
             </ProtectedRoute>
@@ -75,6 +83,7 @@ function App() {
           <Route path="/notifications" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Notifications />
               </Layout>
             </ProtectedRoute>
@@ -83,6 +92,7 @@ function App() {
           <Route path="/settings" element={
             <ProtectedRoute>
               <Layout>
+                <TrialBanner />
                 <Settings />
               </Layout>
             </ProtectedRoute>
@@ -91,6 +101,9 @@ function App() {
           {/* Redirect any unknown routes to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        
+        {/* Global Components */}
+        <OnboardingWizard />
       </Router>
     </AuthProvider>
   );

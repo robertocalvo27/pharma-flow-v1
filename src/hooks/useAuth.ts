@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { useStore } from '../store'
 
 interface AuthState {
   user: User | null
@@ -17,6 +18,44 @@ interface UserProfile {
   is_active: boolean
 }
 
+// Crear suscripción Enterprise trial por defecto
+const createEnterpriseTrialSubscription = () => {
+  const now = new Date();
+  const trialEnd = new Date(now.getTime() + (15 * 24 * 60 * 60 * 1000)); // 15 días
+  
+  return {
+    id: 'sub-1',
+    userId: '1',
+    planId: 'enterprise',
+    planName: 'enterprise' as const,
+    status: 'trial' as const,
+    trialEndsAt: trialEnd.toISOString(),
+    currentPeriodStart: now.toISOString(),
+    currentPeriodEnd: trialEnd.toISOString(),
+    limits: {
+      maxProducts: 100,
+      maxUsers: 25,
+      maxStorageGB: 500,
+      maxApiCalls: 100000,
+      maxCountries: -1
+    },
+    features: {
+      basicWorkflows: true,
+      advancedWorkflows: true,
+      customWorkflows: true,
+      basicReports: true,
+      advancedReports: true,
+      apiIntegrations: true,
+      prioritySupport: true,
+      sso: true,
+      whiteLabeling: true,
+      auditLogs: true,
+      customFields: true,
+      bulkOperations: true
+    }
+  };
+};
+
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -24,6 +63,9 @@ export const useAuth = () => {
     loading: true
   })
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  
+  // Store hooks
+  const { setUser, initializeOnboarding } = useStore()
 
   useEffect(() => {
     // Obtener sesión inicial
@@ -53,11 +95,12 @@ export const useAuth = () => {
         await fetchUserProfile(session.user.id)
       } else {
         setUserProfile(null)
+        setUser(null) // Limpiar el store cuando se desautentica
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [setUser])
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -69,6 +112,23 @@ export const useAuth = () => {
 
       if (error) throw error
       setUserProfile(data)
+      
+      // Sincronizar con el store
+      const storeUser = {
+        id: data.id,
+        email: data.email,
+        fullName: data.full_name,
+        role: data.role,
+        department: data.company,
+        isActive: data.is_active,
+        subscription: createEnterpriseTrialSubscription(),
+        onboardingCompleted: false, // Por defecto false para nuevos usuarios
+        trialStartDate: new Date().toISOString()
+      }
+      
+      setUser(storeUser)
+      initializeOnboarding(storeUser)
+      
     } catch (error) {
       console.error('Error fetching user profile:', error)
     }
@@ -137,6 +197,20 @@ export const useAuth = () => {
 
     if (!error && data) {
       setUserProfile(data)
+      
+      // Actualizar también el store
+      const storeUser = {
+        id: data.id,
+        email: data.email,
+        fullName: data.full_name,
+        role: data.role,
+        department: data.company,
+        isActive: data.is_active,
+        subscription: createEnterpriseTrialSubscription(),
+        onboardingCompleted: false,
+        trialStartDate: new Date().toISOString()
+      }
+      setUser(storeUser)
     }
 
     return { data, error }
