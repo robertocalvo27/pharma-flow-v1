@@ -6,8 +6,9 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
-import { Product, Dossier } from '../../types';
+import { Product, Dossier, DossierSection } from '../../types';
 import { DOSSIER_STATUS_LABELS, DOSSIER_STATUS_COLORS } from '../../utils/constants';
+import { DossierDetailModal } from './DossierDetailModal';
 
 interface DossiersModalProps {
   isOpen: boolean;
@@ -30,6 +31,8 @@ export const DossiersModal: React.FC<DossiersModalProps> = ({
   const [countryFilter, setCountryFilter] = useState('');
   const [manufacturerFilter, setManufacturerFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [selectedDossier, setSelectedDossier] = useState<Dossier | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   // Mock data para países y fabricantes
   const countries = [
@@ -103,6 +106,31 @@ export const DossiersModal: React.FC<DossiersModalProps> = ({
         {label}
       </Badge>
     );
+  };
+
+  const handleDossierClick = (dossier: Dossier) => {
+    setSelectedDossier(dossier);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setShowDetailModal(false);
+    setSelectedDossier(null);
+  };
+
+  const handleBackToList = () => {
+    setShowDetailModal(false);
+    setSelectedDossier(null);
+  };
+
+  const handleSectionUpdate = (sectionId: string, updates: Partial<DossierSection>) => {
+    console.log('Section update:', sectionId, updates);
+    // Aquí actualizarías el estado del dossier/sección
+  };
+
+  const handleDocumentUpload = (sectionId: string, files: FileList) => {
+    console.log('Document upload:', sectionId, files);
+    // Aquí manejarías la subida de documentos
   };
 
   return (
@@ -199,7 +227,7 @@ export const DossiersModal: React.FC<DossiersModalProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onViewDossier(dossier)}
+                      onClick={() => handleDossierClick(dossier)}
                       className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                     >
                       Ver Detalles
@@ -262,6 +290,18 @@ export const DossiersModal: React.FC<DossiersModalProps> = ({
           </div>
         )}
       </div>
+      
+      {/* Dossier Detail Modal */}
+      {selectedDossier && (
+        <DossierDetailModal
+          isOpen={showDetailModal}
+          onClose={handleCloseDetailModal}
+          dossier={selectedDossier}
+          onBack={handleBackToList}
+          onSectionUpdate={handleSectionUpdate}
+          onDocumentUpload={handleDocumentUpload}
+        />
+      )}
     </Modal>
   );
 }; 

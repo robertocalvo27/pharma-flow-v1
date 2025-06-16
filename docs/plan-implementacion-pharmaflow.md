@@ -18,6 +18,9 @@ Este documento establece el plan detallado de implementación para completar el 
 - ✅ **Arquitectura establecida**: Zustand, React Router, mock data
 - ✅ **Páginas principales creadas**: Dashboard, Products, Workflows, etc.
 - ✅ **Autenticación demo**: Login funcional para pruebas
+- ✅ **Sistema de Dossiers implementado**: Modal de lista y detalle funcional
+- ✅ **12 secciones estándar**: Monografía, GMP, Certificados, etc.
+- ✅ **Gestión de documentos**: Upload, versionado, comentarios por sección
 
 ### 1.3 Objetivo Final
 Completar el MVP funcional con integración real de base de datos, autenticación robusta, y todas las funcionalidades core del negocio farmacéutico.
@@ -29,18 +32,24 @@ Completar el MVP funcional con integración real de base de datos, autenticació
 ### 2.1 Objetivos Principales
 1. **Migrar de datos mock a Supabase**: Base de datos PostgreSQL completa
 2. **Implementar autenticación real**: Sistema robusto con roles y permisos
-3. **Completar CRUD de productos**: Gestión completa de productos farmacéuticos
-4. **Sistema de workflows avanzado**: Los 7 pasos regulatorios definidos
-5. **Gestión de documentos**: Upload, versionado, y organización
-6. **Notificaciones automáticas**: Emails y alertas en tiempo real
-7. **Reportes exportables**: PDF, Excel, y dashboards interactivos
+3. **Completar sistema de Dossiers**: Funcionalidad central del negocio farmacéutico
+4. **Completar CRUD de productos**: Gestión completa de productos farmacéuticos
+5. **Sistema de workflows avanzado**: Los 7 pasos regulatorios definidos
+6. **Gestión de documentos avanzada**: Upload, versionado, y organización
+7. **Notificaciones automáticas**: Emails y alertas en tiempo real
+8. **Reportes exportables**: PDF, Excel, y dashboards interactivos
 
 ### 2.2 Funcionalidades Core
+- **Sistema de Dossiers** (FUNCIONALIDAD CENTRAL)
+  - Modal de lista de dossiers por producto
+  - Modal de detalle con 12 secciones estándar
+  - Gestión de documentos por sección
+  - Versionado y comentarios
 - **Gestión de Productos Farmacéuticos**
 - **Registros por País**
 - **Workflows Regulatorios**
 - **Dashboard Ejecutivo**
-- **Sistema de Documentos**
+- **Sistema de Documentos Avanzado**
 - **Notificaciones y Alertas**
 - **Reportes y Analytics**
 
@@ -84,12 +93,16 @@ src/
 │   ├── ui/           ✅ Componentes base (Button, Input, Card, Modal, etc.)
 │   ├── layout/       ✅ Layout components
 │   ├── dashboard/    ✅ Componentes específicos del dashboard
-│   ├── products/     ⚠️ Parcialmente implementado
+│   ├── products/     ✅ Implementado con sistema de dossiers
+│   │   ├── DossiersModal.tsx          ✅ Modal lista de dossiers
+│   │   ├── DossierDetailModal.tsx     ✅ Modal detalle de dossier
+│   │   └── ProductsTable.tsx          ✅ Tabla con botón "Ver Dossiers"
 │   └── workflows/    ⚠️ Básico, necesita expansión
 ├── pages/           ✅ Todas las páginas principales creadas
 ├── store/           ✅ Zustand store configurado
-├── types/           ✅ TypeScript interfaces bien definidas
-├── data/            ✅ Mock data estructurado
+├── types/           ✅ TypeScript interfaces bien definidas (incluye Dossier)
+├── data/            ✅ Mock data estructurado (incluye dossiers)
+├── utils/           ✅ Constantes de dossiers (12 secciones estándar)
 └── hooks/           ❌ Falta crear custom hooks
 ```
 
@@ -194,7 +207,44 @@ src/services/
 
 ## **FASE 2: FUNCIONALIDADES CORE (Semanas 3-4)**
 
-### **Sprint 2.1: Gestión Completa de Productos (5 días)**
+### **Sprint 2.1: Sistema de Dossiers Completo (5 días)**
+
+#### **Funcionalidades a implementar:**
+
+**Día 1-2: Backend de Dossiers**
+```sql
+-- Migrar sistema de dossiers a Supabase:
+- Tabla dossiers con relaciones
+- Tabla dossier_sections (12 secciones estándar)
+- Tabla dossier_documents con versionado
+- Triggers para cálculo de progreso automático
+```
+
+**Día 3-4: Funcionalidades Avanzadas**
+- Integración real con Supabase Storage
+- Upload real de documentos por sección
+- Sistema de comentarios persistente
+- Notificaciones de cambios de estado
+
+**Día 5: Optimizaciones UX**
+- Mejoras en performance del modal
+- Búsqueda avanzada en dossiers
+- Filtros persistentes
+- Exportación de reportes de dossier
+
+**Páginas/Componentes principales:**
+```
+components/products/
+├── DossiersModal.tsx          ✅ Ya implementado
+├── DossierDetailModal.tsx     ✅ Ya implementado  
+├── DossierSectionCard.tsx     🔄 Mejorar con backend
+├── DocumentUpload.tsx         🔄 Integrar con Supabase Storage
+├── DocumentList.tsx           🔄 Versionado real
+├── SectionComments.tsx        🔄 Persistencia en DB
+└── DossierReports.tsx         ➕ Nuevo - Exportaciones
+```
+
+### **Sprint 2.2: Gestión Completa de Productos (5 días)**
 
 #### **Funcionalidades a implementar:**
 
@@ -230,7 +280,11 @@ components/products/
 └── RegistrationList.tsx
 ```
 
-### **Sprint 2.2: Sistema de Workflows (5 días)**
+---
+
+## **FASE 3: WORKFLOWS Y AUTOMATIZACIÓN (Semanas 5-6)**
+
+### **Sprint 3.1: Sistema de Workflows (5 días)**
 
 #### **Los 7 Pasos Regulatorios:**
 1. **Generado** - Solicitud creada
@@ -503,10 +557,10 @@ src/
 |--------|---------|------------------------|--------------|
 | **1** | 1.1 | Setup Supabase | DB configurada, Auth básico |
 | **2** | 1.2 | Autenticación Real | Login/logout funcional |
-| **3** | 2.1 | CRUD Productos | Gestión completa productos |
-| **4** | 2.2 | Workflows | Sistema 7 pasos |
-| **5** | 3.1 | Documentos | Upload y gestión archivos |
-| **6** | 3.2 | Notificaciones | Sistema completo alertas |
+| **3** | 2.1 | **Sistema Dossiers Completo** | **Backend + Frontend integrado** |
+| **4** | 2.2 | CRUD Productos | Gestión completa productos |
+| **5** | 3.1 | Workflows | Sistema 7 pasos |
+| **6** | 3.2 | Documentos Avanzados | Upload real y gestión archivos |
 | **7** | 4.1-4.2 | Reportes | Dashboard y exportaciones |
 | **8** | 5.1-5.2 | Testing & Deploy | MVP completo y desplegado |
 
@@ -598,6 +652,36 @@ src/
 
 ---
 
-**Este plan representa la hoja de ruta completa para transformar PharmaFlow de un prototipo funcional a un MVP production-ready en 8 semanas.**
+---
+
+## 📈 **13. MEJORAS RECIENTES IMPLEMENTADAS**
+
+### **Sistema de Dossiers - Funcionalidad Central**
+- ✅ **DossiersModal**: Modal de lista con filtros avanzados y métricas
+- ✅ **DossierDetailModal**: Modal de detalle con 12 secciones expandibles
+- ✅ **Gestión de documentos**: Upload, versionado, comentarios por sección
+- ✅ **Estados visuales**: Barras de progreso, badges de estado, iconos intuitivos
+- ✅ **UX optimizada**: Navegación fluida, modal responsive (2xl), espaciado profesional
+- ✅ **12 secciones estándar**: Monografía, GMP, Certificados, Fórmulas, etc.
+
+### **Componentes UI Mejorados**
+- ✅ **Modal**: Nuevo tamaño 2xl (max-w-6xl) para mejor aprovechamiento
+- ✅ **Button**: Soporte para iconos únicos sin texto
+- ✅ **Responsive**: Adaptación perfecta a diferentes tamaños de pantalla
+
+### **Arquitectura de Datos**
+- ✅ **Types**: Interfaces completas para Dossier, DossierSection, DossierDocument
+- ✅ **Constants**: 12 secciones estándar con descripciones
+- ✅ **Mock Data**: Datos realistas para desarrollo y demos
+
+### **Próximos Pasos Inmediatos**
+1. **Migrar a Supabase**: Backend real para persistencia
+2. **Upload real**: Integración con Supabase Storage
+3. **Notificaciones**: Sistema de alertas por cambios
+4. **Reportes**: Exportación de dossiers a PDF/Excel
+
+---
+
+**Este plan representa la hoja de ruta completa para transformar PharmaFlow de un prototipo funcional a un MVP production-ready en 8 semanas, con el sistema de Dossiers como funcionalidad central del negocio farmacéutico.**
 
 **¿Estás listo para comenzar? 🚀** 

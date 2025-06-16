@@ -7,23 +7,30 @@ Sistema SaaS diseñado para modernizar la gestión de registros de productos far
 
 ### 1.2 Problema Identificado
 - Las empresas farmacéuticas dependen de Excel y Google Drive para la gestión de registros
+- **Gestión manual de Dossiers**: Carpetas de Google Drive con 12 secciones estándar por producto/país/fabricante
 - Falta de estructura moderna para el seguimiento de estados de aprobación y renovación
 - Ausencia de workflows automatizados para procesos regulatorios
 - Dificultad para centralizar información técnica, legal y de registro por país
+- **Sin trazabilidad de documentos**: Versiones, comentarios y estados dispersos
 
 ### 1.3 Solución Propuesta
 Plataforma web que centraliza la información de productos farmacéuticos con:
 - Dashboard intuitivo para visualización de todos los productos
+- **Sistema de Dossiers digitales**: Reemplaza carpetas de Google Drive con gestión inteligente
+- **12 secciones estándar por Dossier**: Monografía, GMP, Certificados, Fórmulas, etc.
 - Sistema de workflow para aprobaciones y renovaciones
 - Gestión por países y regulaciones específicas
+- **Versionado y trazabilidad completa** de documentos
 - Interfaz moderna y fácil de usar
 
 ## 2. Objetivos del Sistema
 
 ### 2.1 Objetivos Principales
 - **Centralización**: Unificar toda la información de productos farmacéuticos en una sola plataforma
+- **Digitalización de Dossiers**: Reemplazar completamente las carpetas de Google Drive
 - **Automatización**: Implementar workflows para procesos de aprobación y renovación
 - **Visibilidad**: Proporcionar dashboards con estados en tiempo real
+- **Trazabilidad**: Control completo de versiones, comentarios y cambios en documentos
 - **Escalabilidad**: Soportar operaciones a nivel nacional e internacional
 - **Compliance**: Mantener registros auditables para cumplimiento regulatorio
 
@@ -138,9 +145,77 @@ src/
 └── types/                  # TypeScript types
 ```
 
-## 6. Modelo de Datos
+## 6. Sistema de Dossiers - Funcionalidad Central
 
-### 6.1 Entidades Principales
+### 6.1 Concepto de Dossier
+Un **Dossier** representa la combinación única de:
+- **Producto farmacéutico** (ej: Paracetamol 500mg)
+- **Fabricante** (ej: Laboratorios Farmex S.A.)
+- **País de registro** (ej: Costa Rica)
+
+Cada Dossier contiene **12 secciones estándar** con documentos técnicos y legales requeridos para el registro farmacéutico.
+
+### 6.2 Las 12 Secciones Estándar del Dossier
+1. **Monografía** - Información detallada del producto farmacéutico
+2. **GMP** - Certificado de Buenas Prácticas de Manufactura
+3. **Certificado de Libre Venta** - Documento de comercialización libre
+4. **Fórmula CualiCuantitativa** - Composición exacta del producto
+5. **Método de Análisis** - Procedimientos de control de calidad
+6. **Validación** - Estudios de validación de procesos
+7. **Especificaciones Producto Terminado** - Características finales
+8. **Estudio de Estabilidad** - Análisis de vida útil
+9. **Declaración Patentes y Datos de Prueba** - Aspectos legales
+10. **Artes** - Diseños de etiquetas y empaques
+11. **Poderes y Documentos Aclaratorios** - Documentación legal
+12. **Pago y Solicitud** - Comprobantes y formularios oficiales
+
+### 6.3 Estados del Dossier y Secciones
+- **Draft** (Borrador) - En preparación inicial
+- **In Progress** (En Progreso) - Documentos siendo completados
+- **Completed** (Completado) - Todas las secciones finalizadas
+- **Submitted** (Enviado) - Presentado a autoridades
+- **Approved** (Aprobado) - Registro otorgado
+- **Rejected** (Rechazado) - Requiere correcciones
+
+### 6.4 Funcionalidades del Sistema de Dossiers
+
+#### **Modal de Lista de Dossiers**
+- Vista de todos los dossiers por producto
+- Filtros por país, fabricante, estado
+- Barras de progreso visual (% completado)
+- Contadores de secciones completadas (ej: 8/12)
+- Búsqueda inteligente
+
+#### **Modal de Detalle de Dossier**
+- **Header informativo**: Producto, país, fabricante, progreso general
+- **Lista expandible de secciones**: Click para ver detalles
+- **Gestión de documentos por sección**:
+  - Upload múltiple de archivos
+  - Versionado automático
+  - Preview de documentos
+  - Estados por documento
+- **Sistema de comentarios**: Notas y observaciones por sección
+- **Cambio de estados**: Marcar secciones como completadas
+- **Navegación fluida**: Entre lista y detalle
+
+#### **Gestión de Documentos**
+- **Tipos soportados**: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, TIFF
+- **Versionado**: Control automático de versiones
+- **Metadatos**: Fecha, usuario, comentarios
+- **Organización**: Por sección del dossier
+- **Búsqueda**: Full-text en nombres y contenido
+
+### 6.5 Flujo de Trabajo con Dossiers
+1. **Creación**: Nuevo dossier para producto + fabricante + país
+2. **Completado por secciones**: Upload progresivo de documentos
+3. **Revisión interna**: Comentarios y validaciones
+4. **Envío a autoridades**: Cambio de estado a "Submitted"
+5. **Seguimiento**: Tracking del proceso regulatorio
+6. **Aprobación/Rechazo**: Estado final del registro
+
+## 7. Modelo de Datos
+
+### 7.1 Entidades Principales
 
 #### Products (Productos)
 ```sql
@@ -175,12 +250,59 @@ CREATE TABLE product_registrations (
 );
 ```
 
+#### Dossiers (Expedientes Regulatorios)
+```sql
+CREATE TABLE dossiers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID REFERENCES products(id),
+  manufacturer_id UUID REFERENCES manufacturers(id),
+  country_code VARCHAR(2) NOT NULL,
+  status VARCHAR NOT NULL DEFAULT 'draft', -- 'draft', 'in_progress', 'completed', 'submitted', 'approved', 'rejected'
+  completion_percentage INTEGER DEFAULT 0,
+  workflow_id UUID REFERENCES workflows(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### Dossier_Sections (Secciones del Dossier)
+```sql
+CREATE TABLE dossier_sections (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  dossier_id UUID REFERENCES dossiers(id),
+  section_number INTEGER NOT NULL, -- 1-12
+  section_name VARCHAR NOT NULL,
+  description TEXT,
+  status VARCHAR NOT NULL DEFAULT 'pending', -- 'pending', 'in_progress', 'completed', 'approved', 'rejected'
+  completed_at TIMESTAMP,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### Dossier_Documents (Documentos del Dossier)
+```sql
+CREATE TABLE dossier_documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  section_id UUID REFERENCES dossier_sections(id),
+  dossier_id UUID REFERENCES dossiers(id),
+  file_name VARCHAR NOT NULL,
+  file_type VARCHAR NOT NULL,
+  file_size INTEGER,
+  file_path VARCHAR NOT NULL,
+  version INTEGER DEFAULT 1,
+  status VARCHAR NOT NULL DEFAULT 'draft',
+  uploaded_by UUID REFERENCES users(id),
+  uploaded_at TIMESTAMP DEFAULT NOW(),
+  notes TEXT
+);
+```
+
 #### Workflows (Flujos de Trabajo)
 ```sql
 CREATE TABLE workflows (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id UUID REFERENCES products(id),
-  country_code VARCHAR(2),
+  dossier_id UUID REFERENCES dossiers(id), -- Ahora vinculado a dossier
   workflow_type VARCHAR NOT NULL, -- 'registration', 'renewal', 'variation'
   current_step VARCHAR NOT NULL,
   status VARCHAR NOT NULL DEFAULT 'pending',
@@ -246,20 +368,52 @@ CREATE TABLE documents (
 );
 ```
 
-## 7. Funcionalidades Principales
+## 8. Funcionalidades Principales
 
-### 7.1 Dashboard Principal
+### 8.1 Dashboard Principal
 - **Vista General de Productos**: Lista completa con filtros y búsqueda
+- **Resumen de Dossiers**: Métricas de dossiers por estado y país
 - **Estados de Workflows**: Visualización del progreso de aprobaciones
 - **Métricas Clave**: KPIs de registros, renovaciones y vencimientos
 - **Alertas**: Notificaciones de fechas próximas de vencimiento
+- **Progreso Visual**: Gráficos de completado de dossiers
 
-### 7.2 Gestión de Productos
+### 8.2 Gestión de Productos
 - **CRUD Completo**: Crear, leer, actualizar y eliminar productos
 - **Información Técnica**: Ingredientes activos, forma farmacéutica, concentración
 - **Información Comercial**: Fabricante, clase terapéutica, código ATC
+- **Botón "Ver Dossiers"**: Acceso directo al modal de dossiers por producto
 - **Registro por Países**: Múltiples registros por producto
 - **Historial de Cambios**: Trazabilidad completa de modificaciones
+
+### 8.3 Sistema de Dossiers (FUNCIONALIDAD CENTRAL)
+- **Modal de Lista de Dossiers**:
+  - Vista de todos los dossiers por producto
+  - Filtros avanzados por país, fabricante, estado
+  - Barras de progreso visual con porcentajes
+  - Contadores de secciones (ej: 10/12 completadas)
+  - Búsqueda inteligente por país o fabricante
+  - Resumen estadístico (Total, Aprobados, En Progreso, Borradores)
+
+- **Modal de Detalle de Dossier**:
+  - Header con información completa del dossier
+  - Barra de progreso general del dossier
+  - Lista expandible de las 12 secciones estándar
+  - Gestión de documentos por sección:
+    * Upload múltiple de archivos
+    * Versionado automático
+    * Lista de documentos con metadatos
+    * Estados por documento
+  - Sistema de comentarios y notas por sección
+  - Cambio de estados de secciones (Pendiente ↔ Completada)
+  - Navegación fluida entre lista y detalle
+
+- **Gestión de Documentos**:
+  - Soporte para múltiples formatos (PDF, DOC, XLS, imágenes)
+  - Control de versiones automático
+  - Metadatos completos (fecha, usuario, tamaño)
+  - Preview de documentos
+  - Organización por sección del dossier
 
 ### 7.3 Sistema de Workflows
 - **Tipos de Workflow**:
