@@ -10,6 +10,7 @@ import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { Products } from './pages/Products';
 import { Workflows } from './pages/Workflows';
+import Compliance from './pages/Compliance';
 import { Registrations } from './pages/Registrations';
 import { Reports } from './pages/Reports';
 import { Users } from './pages/Users';
@@ -49,6 +50,15 @@ function App() {
               <Layout>
                 <TrialBanner />
                 <Workflows />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/compliance" element={
+            <ProtectedRoute>
+              <Layout>
+                <TrialBanner />
+                <Compliance />
               </Layout>
             </ProtectedRoute>
           } />

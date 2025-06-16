@@ -10,7 +10,8 @@ import {
   Users,
   Bell,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 import { useStore } from '../../store';
 
@@ -18,6 +19,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Productos', href: '/products', icon: Pill },
   { name: 'Workflows', href: '/workflows', icon: GitBranch },
+  { name: 'Compliance', href: '/compliance', icon: Shield },
   { name: 'Registros', href: '/registrations', icon: FileText },
   { name: 'Reportes', href: '/reports', icon: BarChart3 },
   { name: 'Usuarios', href: '/users', icon: Users },
