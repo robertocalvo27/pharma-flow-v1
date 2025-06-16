@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Pill, ArrowRight, Shield, Users, BarChart3 } from 'lucide-react';
+import { useAuthContext } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
@@ -14,16 +16,30 @@ interface LoginFormData {
 export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
+  const { signIn, isAuthenticated } = useAuthContext();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+  
+  // Si ya está autenticado, redirigir
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
   
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log('Login attempt:', data);
-    setIsLoading(false);
-    // TODO: Implement actual authentication
+    setError(null);
+    
+    try {
+      const { error } = await signIn(data.email, data.password);
+      if (error) {
+        setError(error.message);
+      }
+    } catch (err) {
+      setError('Error inesperado. Por favor intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const features = [
@@ -125,6 +141,14 @@ export const Login: React.FC = () => {
             </div>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {error && (
+                <div className="rounded-md bg-red-50 p-4 border border-red-200">
+                  <div className="text-sm text-red-700">
+                    {error}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Input
                   label="Correo Electrónico"
@@ -181,12 +205,21 @@ export const Login: React.FC = () => {
                     Recordarme
                   </span>
                 </label>
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={() => {
+                    const email = (document.querySelector('input[type="email"]') as HTMLInputElement)?.value;
+                    if (email) {
+                      // TODO: Implementar resetPassword del useAuth
+                      alert('Funcionalidad de recuperación de contraseña próximamente');
+                    } else {
+                      alert('Por favor ingresa tu email primero');
+                    }
+                  }}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:underline"
                 >
                   ¿Olvidaste tu contraseña?
-                </a>
+                </button>
               </div>
               
               <Button
@@ -204,12 +237,12 @@ export const Login: React.FC = () => {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-center text-sm text-gray-600">
                 ¿No tienes una cuenta?{' '}
-                <a
-                  href="#"
+                <Link
+                  to="/register"
                   className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:underline"
                 >
-                  Solicita una demo
-                </a>
+                  Crear cuenta
+                </Link>
               </p>
             </div>
           </Card>
