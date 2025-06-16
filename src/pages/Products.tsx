@@ -6,8 +6,10 @@ import { Select } from '../components/ui/Select';
 import { Modal } from '../components/ui/Modal';
 import { ProductsTable } from '../components/products/ProductsTable';
 import { ProductForm } from '../components/products/ProductForm';
+import { DossiersModal } from '../components/products/DossiersModal';
+import { DossierDetailModal } from '../components/products/DossierDetailModal';
 import { useStore } from '../store';
-import { Product } from '../types';
+import { Product, Dossier } from '../types';
 import { mockProducts } from '../data/mockData';
 
 export const Products: React.FC = () => {
@@ -16,7 +18,10 @@ export const Products: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDossiersModalOpen, setIsDossiersModalOpen] = useState(false);
+  const [isDossierDetailModalOpen, setIsDossierDetailModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedDossier, setSelectedDossier] = useState<Dossier | null>(null);
   
   useEffect(() => {
     if (products.length === 0) {
@@ -69,6 +74,25 @@ export const Products: React.FC = () => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
   };
+
+  const handleViewDossiers = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDossiersModalOpen(true);
+  };
+
+  const handleViewDossier = (dossier: Dossier) => {
+    setSelectedDossier(dossier);
+    setIsDossiersModalOpen(false);
+    setIsDossierDetailModalOpen(true);
+  };
+
+  const handleCloseDossierDetail = () => {
+    setIsDossierDetailModalOpen(false);
+    setSelectedDossier(null);
+    if (selectedProduct) {
+      setIsDossiersModalOpen(true);
+    }
+  };
   
   return (
     <div className="p-6 space-y-6">
@@ -95,14 +119,13 @@ export const Products: React.FC = () => {
             placeholder="Buscar productos..."
             icon={Search}
             value={searchTerm}
-            onChange={setSearchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="w-full sm:w-48">
           <Select
-            placeholder="Filtrar por estado"
             value={statusFilter}
-            onChange={setStatusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
             options={statusOptions}
           />
         </div>
@@ -117,6 +140,7 @@ export const Products: React.FC = () => {
         onView={handleViewProduct}
         onEdit={handleEditClick}
         onDelete={handleDeleteProduct}
+        onViewDossiers={handleViewDossiers}
       />
       
       {/* Create Product Modal */}
@@ -153,6 +177,28 @@ export const Products: React.FC = () => {
           />
         )}
       </Modal>
+
+      {/* Dossiers Modal */}
+      {selectedProduct && (
+        <DossiersModal
+          isOpen={isDossiersModalOpen}
+          onClose={() => {
+            setIsDossiersModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          product={selectedProduct}
+          onViewDossier={handleViewDossier}
+        />
+      )}
+
+      {/* Dossier Detail Modal */}
+      {selectedDossier && (
+        <DossierDetailModal
+          isOpen={isDossierDetailModalOpen}
+          onClose={handleCloseDossierDetail}
+          dossier={selectedDossier}
+        />
+      )}
     </div>
   );
 };

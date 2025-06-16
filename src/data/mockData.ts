@@ -1,4 +1,4 @@
-import { Product, Workflow, DashboardStats, Country } from '../types';
+import { Product, Workflow, DashboardStats, Country, Dossier } from '../types';
 
 export const mockProducts: Product[] = [
   {
@@ -282,6 +282,8 @@ export const mockDashboardStats: DashboardStats = {
   activeRegistrations: 45,
   pendingWorkflows: 8,
   expiringRegistrations: 3,
+  totalDossiers: 15,
+  completedDossiers: 8,
   workflowDistribution: [
     { name: 'Registros', value: 12, color: '#2563EB' },
     { name: 'Renovaciones', value: 6, color: '#059669' },
@@ -305,6 +307,12 @@ export const mockDashboardStats: DashboardStats = {
     { month: 'Ago', registrations: 9, renewals: 2 },
     { month: 'Sep', registrations: 6, renewals: 3 },
     { month: 'Oct', registrations: 3, renewals: 6 }
+  ],
+  dossierProgress: [
+    { country: 'Colombia', completed: 5, total: 8, percentage: 62.5 },
+    { country: 'Perú', completed: 3, total: 4, percentage: 75 },
+    { country: 'México', completed: 2, total: 3, percentage: 66.7 },
+    { country: 'Argentina', completed: 1, total: 2, percentage: 50 }
   ]
 };
 
@@ -317,4 +325,163 @@ export const mockCountries: Country[] = [
   { code: 'EC', name: 'Ecuador', regulatoryAgency: 'ARCSA', isActive: true },
   { code: 'BO', name: 'Bolivia', regulatoryAgency: 'AGEMED', isActive: true },
   { code: 'PY', name: 'Paraguay', regulatoryAgency: 'DINAVISA', isActive: true }
+];
+
+export const mockDossiers: Dossier[] = [
+  {
+    id: 'dossier-1',
+    productId: '1',
+    productName: 'Paracetamol Plus 500mg',
+    manufacturerId: 'mfg-1',
+    manufacturerName: 'Laboratorios Farmex S.A.',
+    countryCode: 'CO',
+    countryName: 'Colombia',
+    status: 'in_progress',
+    completionPercentage: 75,
+    createdAt: '2024-01-10T08:00:00Z',
+    updatedAt: '2024-01-20T14:30:00Z',
+    workflowId: 'wf-1',
+    sections: [
+      {
+        id: 'section-1-1',
+        dossierId: 'dossier-1',
+        sectionNumber: 1,
+        sectionName: 'Monografía del Producto',
+        description: 'Información técnica completa del producto farmacéutico',
+        status: 'completed',
+        completedAt: '2024-01-12T10:00:00Z',
+        documents: [
+          {
+            id: 'doc-1-1-1',
+            sectionId: 'section-1-1',
+            dossierId: 'dossier-1',
+            fileName: 'monografia_paracetamol_v2.pdf',
+            fileType: 'application/pdf',
+            fileSize: 2048576,
+            filePath: '/documents/dossier-1/section-1/monografia_paracetamol_v2.pdf',
+            version: 2,
+            status: 'approved',
+            uploadedBy: 'user-1',
+            uploadedByName: 'Dr. Carlos Mendoza',
+            uploadedAt: '2024-01-12T10:00:00Z',
+            notes: 'Versión actualizada con correcciones menores'
+          }
+        ]
+      },
+      {
+        id: 'section-1-2',
+        dossierId: 'dossier-1',
+        sectionNumber: 2,
+        sectionName: 'Certificado GMP',
+        description: 'Certificado de Buenas Prácticas de Manufactura',
+        status: 'completed',
+        completedAt: '2024-01-15T16:00:00Z',
+        documents: [
+          {
+            id: 'doc-1-2-1',
+            sectionId: 'section-1-2',
+            dossierId: 'dossier-1',
+            fileName: 'certificado_gmp_2024.pdf',
+            fileType: 'application/pdf',
+            fileSize: 1024000,
+            filePath: '/documents/dossier-1/section-2/certificado_gmp_2024.pdf',
+            version: 1,
+            status: 'approved',
+            uploadedBy: 'user-2',
+            uploadedByName: 'Ana Torres',
+            uploadedAt: '2024-01-15T16:00:00Z'
+          }
+        ]
+      },
+      {
+        id: 'section-1-3',
+        dossierId: 'dossier-1',
+        sectionNumber: 3,
+        sectionName: 'Certificados de Análisis',
+        description: 'Certificados de análisis de lotes representativos',
+        status: 'in_progress',
+        documents: [
+          {
+            id: 'doc-1-3-1',
+            sectionId: 'section-1-3',
+            dossierId: 'dossier-1',
+            fileName: 'analisis_lote_001.pdf',
+            fileType: 'application/pdf',
+            fileSize: 512000,
+            filePath: '/documents/dossier-1/section-3/analisis_lote_001.pdf',
+            version: 1,
+            status: 'submitted',
+            uploadedBy: 'user-3',
+            uploadedByName: 'Luis Ramírez',
+            uploadedAt: '2024-01-18T09:30:00Z',
+            notes: 'Pendiente de revisión técnica'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'dossier-2',
+    productId: '2',
+    productName: 'Amoxicilina 875mg',
+    manufacturerId: 'mfg-2',
+    manufacturerName: 'Biotech Pharmaceuticals Ltd.',
+    countryCode: 'PE',
+    countryName: 'Perú',
+    status: 'completed',
+    completionPercentage: 100,
+    createdAt: '2023-12-01T08:00:00Z',
+    updatedAt: '2024-01-05T12:00:00Z',
+    sections: [
+      {
+        id: 'section-2-1',
+        dossierId: 'dossier-2',
+        sectionNumber: 1,
+        sectionName: 'Monografía del Producto',
+        description: 'Información técnica completa del producto farmacéutico',
+        status: 'completed',
+        completedAt: '2023-12-10T14:00:00Z',
+        documents: [
+          {
+            id: 'doc-2-1-1',
+            sectionId: 'section-2-1',
+            dossierId: 'dossier-2',
+            fileName: 'monografia_amoxicilina.pdf',
+            fileType: 'application/pdf',
+            fileSize: 1800000,
+            filePath: '/documents/dossier-2/section-1/monografia_amoxicilina.pdf',
+            version: 1,
+            status: 'approved',
+            uploadedBy: 'user-4',
+            uploadedByName: 'Dra. Patricia Silva',
+            uploadedAt: '2023-12-10T14:00:00Z'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'dossier-3',
+    productId: '3',
+    productName: 'Ibuprofeno 400mg',
+    manufacturerId: 'mfg-1',
+    manufacturerName: 'Laboratorios Farmex S.A.',
+    countryCode: 'MX',
+    countryName: 'México',
+    status: 'draft',
+    completionPercentage: 25,
+    createdAt: '2024-01-25T10:00:00Z',
+    updatedAt: '2024-01-25T10:00:00Z',
+    sections: [
+      {
+        id: 'section-3-1',
+        dossierId: 'dossier-3',
+        sectionNumber: 1,
+        sectionName: 'Monografía del Producto',
+        description: 'Información técnica completa del producto farmacéutico',
+        status: 'pending',
+        documents: []
+      }
+    ]
+  }
 ];

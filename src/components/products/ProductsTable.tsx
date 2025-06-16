@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Eye, Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { Eye, Edit, Trash2, FileText } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -12,13 +12,15 @@ interface ProductsTableProps {
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onViewDossiers: (product: Product) => void;
 }
 
 export const ProductsTable: React.FC<ProductsTableProps> = ({
   products,
   onView,
   onEdit,
-  onDelete
+  onDelete,
+  onViewDossiers
 }) => {
   const getStatusBadge = (status: Product['status']) => {
     const variants = {
@@ -95,21 +97,31 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
+                      icon={FileText}
+                      onClick={() => onViewDossiers(product)}
+                    >
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       icon={Eye}
                       onClick={() => onView(product)}
-                    />
+                    >
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       icon={Edit}
                       onClick={() => onEdit(product)}
-                    />
+                    >
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       icon={Trash2}
                       onClick={() => onDelete(product)}
-                    />
+                    >
+                    </Button>
                   </div>
                 </td>
               </tr>
