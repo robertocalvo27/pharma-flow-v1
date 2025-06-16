@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { Product, Workflow, User, DashboardStats, ProductRegistration } from '../types';
+import { Product, Workflow, User, DashboardStats, ProductRegistration, OnboardingState, UserSubscription } from '../types';
+import { SUBSCRIPTION_PLANS, ONBOARDING_STEPS } from '../utils/constants';
 
 interface AppState {
   // User state
@@ -22,13 +23,42 @@ interface AppState {
   dashboardStats: DashboardStats | null;
   setDashboardStats: (stats: DashboardStats) => void;
   
+  // Onboarding state
+  onboarding: OnboardingState;
+  setOnboardingStep: (step: number) => void;
+  completeOnboardingStep: (stepId: string) => void;
+  showOnboarding: (show: boolean) => void;
+  skipOnboarding: () => void;
+  
+  // Subscription state
+  updateSubscription: (subscription: Partial<UserSubscription>) => void;
+  
   // UI state
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
 }
 
+// Crear suscripción Enterprise trial por defecto
+const createEnterpriseTrialSubscription = (): UserSubscription => {
+  const now = new Date();
+  const trialEnd = new Date(now.getTime() + (15 * 24 * 60 * 60 * 1000)); // 15 días
+  
+  return {
+    id: 'sub-1',
+    userId: '1',
+    planId: 'enterprise',
+    planName: 'enterprise',
+    status: 'trial',
+    trialEndsAt: trialEnd.toISOString(),
+    currentPeriodStart: now.toISOString(),
+    currentPeriodEnd: trialEnd.toISOString(),
+    limits: SUBSCRIPTION_PLANS.ENTERPRISE.limits,
+    features: SUBSCRIPTION_PLANS.ENTERPRISE.features
+  };
+};
+
 export const useStore = create<AppState>((set, get) => ({
-  // User state
+  // User state - Usuario con trial Enterprise
   user: {
     id: '1',
     email: 'admin@pharmaflow.com',
@@ -36,6 +66,9 @@ export const useStore = create<AppState>((set, get) => ({
     role: 'admin',
     department: 'Asuntos Regulatorios',
     isActive: true,
+    subscription: createEnterpriseTrialSubscription(),
+    onboardingCompleted: false,
+    trialStartDate: new Date().toISOString()
   },
   setUser: (user) => set({ user }),
   
@@ -72,6 +105,43 @@ export const useStore = create<AppState>((set, get) => ({
   // Dashboard state
   dashboardStats: null,
   setDashboardStats: (stats) => set({ dashboardStats: stats }),
+  
+  // Onboarding state
+  onboarding: {
+    currentStep: 0,
+    totalSteps: ONBOARDING_STEPS.length,
+    steps: ONBOARDING_STEPS.map(step => ({ ...step })),
+    showOnboarding: true, // Mostrar onboarding por defecto para nuevos usuarios
+    skipAvailable: true
+  },
+  setOnboardingStep: (step) => set((state) => ({
+    onboarding: { ...state.onboarding, currentStep: step }
+  })),
+  completeOnboardingStep: (stepId) => set((state) => ({
+    onboarding: {
+      ...state.onboarding,
+      steps: state.onboarding.steps.map(step => 
+        step.id === stepId ? { ...step, completed: true } : step
+      )
+    }
+  })),
+  showOnboarding: (show) => set((state) => ({
+    onboarding: { ...state.onboarding, showOnboarding: show }
+  })),
+  skipOnboarding: () => set((state) => ({
+    onboarding: { ...state.onboarding, showOnboarding: false },
+    user: state.user ? { ...state.user, onboardingCompleted: true } : null
+  })),
+  
+  // Subscription state
+  updateSubscription: (subscriptionUpdate) => set((state) => ({
+    user: state.user ? {
+      ...state.user,
+      subscription: state.user.subscription ? 
+        { ...state.user.subscription, ...subscriptionUpdate } : 
+        undefined
+    } : null
+  })),
   
   // UI state
   sidebarOpen: true,

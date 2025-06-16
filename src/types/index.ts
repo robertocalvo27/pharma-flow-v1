@@ -63,6 +63,9 @@ export interface User {
   role: 'admin' | 'manager' | 'user';
   department: string;
   isActive: boolean;
+  subscription?: UserSubscription;
+  onboardingCompleted?: boolean;
+  trialStartDate?: string;
 }
 
 export interface Country {
@@ -138,4 +141,71 @@ export interface DashboardStats {
   statusDistribution: { name: string; value: number; color: string }[];
   monthlyRegistrations: { month: string; registrations: number; renewals: number }[];
   dossierProgress: { country: string; completed: number; total: number; percentage: number }[];
+}
+
+export interface UserSubscription {
+  id: string;
+  userId: string;
+  planId: string;
+  planName: 'starter' | 'professional' | 'enterprise' | 'pharma_corp';
+  status: 'trial' | 'active' | 'cancelled' | 'expired';
+  trialEndsAt?: string;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  limits: PlanLimits;
+  features: PlanFeatures;
+}
+
+export interface PlanLimits {
+  maxProducts: number;
+  maxUsers: number;
+  maxStorageGB: number;
+  maxApiCalls: number;
+  maxCountries: number;
+}
+
+export interface PlanFeatures {
+  basicWorkflows: boolean;
+  advancedWorkflows: boolean;
+  customWorkflows: boolean;
+  basicReports: boolean;
+  advancedReports: boolean;
+  apiIntegrations: boolean;
+  prioritySupport: boolean;
+  sso: boolean;
+  whiteLabeling: boolean;
+  auditLogs: boolean;
+  customFields: boolean;
+  bulkOperations: boolean;
+}
+
+export interface Plan {
+  id: string;
+  name: string;
+  displayName: string;
+  description: string;
+  price: number;
+  currency: 'USD';
+  billingPeriod: 'monthly' | 'yearly';
+  limits: PlanLimits;
+  features: PlanFeatures;
+  popular?: boolean;
+  trialDays?: number;
+}
+
+export interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  component: string;
+  completed: boolean;
+  optional?: boolean;
+}
+
+export interface OnboardingState {
+  currentStep: number;
+  totalSteps: number;
+  steps: OnboardingStep[];
+  showOnboarding: boolean;
+  skipAvailable: boolean;
 }

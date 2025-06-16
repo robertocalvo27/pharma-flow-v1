@@ -135,4 +135,173 @@ export const FILE_TYPE_EXTENSIONS = {
   'image/jpeg': '.jpg',
   'image/png': '.png',
   'image/tiff': '.tiff'
-} as const; 
+} as const;
+
+// Planes de suscripción basados en la estrategia de precios
+export const SUBSCRIPTION_PLANS = {
+  STARTER: {
+    id: 'starter',
+    name: 'starter',
+    displayName: 'Plan Starter',
+    description: 'Para pequeñas farmacéuticas y biotechs en crecimiento',
+    price: 149,
+    currency: 'USD' as const,
+    billingPeriod: 'monthly' as const,
+    trialDays: 15,
+    limits: {
+      maxProducts: 10,
+      maxUsers: 3,
+      maxStorageGB: 25,
+      maxApiCalls: 5000,
+      maxCountries: 3
+    },
+    features: {
+      basicWorkflows: true,
+      advancedWorkflows: false,
+      customWorkflows: false,
+      basicReports: true,
+      advancedReports: false,
+      apiIntegrations: false,
+      prioritySupport: false,
+      sso: false,
+      whiteLabeling: false,
+      auditLogs: false,
+      customFields: false,
+      bulkOperations: false
+    }
+  },
+  PROFESSIONAL: {
+    id: 'professional',
+    name: 'professional',
+    displayName: 'Plan Professional',
+    description: 'Para empresas farmacéuticas medianas con operaciones multi-país',
+    price: 399,
+    currency: 'USD' as const,
+    billingPeriod: 'monthly' as const,
+    trialDays: 15,
+    popular: true,
+    limits: {
+      maxProducts: 35,
+      maxUsers: 10,
+      maxStorageGB: 100,
+      maxApiCalls: 25000,
+      maxCountries: 10
+    },
+    features: {
+      basicWorkflows: true,
+      advancedWorkflows: true,
+      customWorkflows: false,
+      basicReports: true,
+      advancedReports: true,
+      apiIntegrations: true,
+      prioritySupport: false,
+      sso: false,
+      whiteLabeling: false,
+      auditLogs: true,
+      customFields: true,
+      bulkOperations: true
+    }
+  },
+  ENTERPRISE: {
+    id: 'enterprise',
+    name: 'enterprise',
+    displayName: 'Plan Enterprise',
+    description: 'Para grandes farmacéuticas con operaciones globales complejas',
+    price: 899,
+    currency: 'USD' as const,
+    billingPeriod: 'monthly' as const,
+    trialDays: 15,
+    limits: {
+      maxProducts: 100,
+      maxUsers: 25,
+      maxStorageGB: 500,
+      maxApiCalls: 100000,
+      maxCountries: -1 // Ilimitado
+    },
+    features: {
+      basicWorkflows: true,
+      advancedWorkflows: true,
+      customWorkflows: true,
+      basicReports: true,
+      advancedReports: true,
+      apiIntegrations: true,
+      prioritySupport: true,
+      sso: true,
+      whiteLabeling: true,
+      auditLogs: true,
+      customFields: true,
+      bulkOperations: true
+    }
+  },
+  PHARMA_CORP: {
+    id: 'pharma_corp',
+    name: 'pharma_corp',
+    displayName: 'Plan Pharma Corp',
+    description: 'Para Big Pharma y corporaciones multinacionales',
+    price: 4000, // Precio promedio
+    currency: 'USD' as const,
+    billingPeriod: 'monthly' as const,
+    trialDays: 30,
+    limits: {
+      maxProducts: -1, // Ilimitado
+      maxUsers: -1, // Ilimitado
+      maxStorageGB: 1000,
+      maxApiCalls: -1, // Ilimitado
+      maxCountries: -1 // Ilimitado
+    },
+    features: {
+      basicWorkflows: true,
+      advancedWorkflows: true,
+      customWorkflows: true,
+      basicReports: true,
+      advancedReports: true,
+      apiIntegrations: true,
+      prioritySupport: true,
+      sso: true,
+      whiteLabeling: true,
+      auditLogs: true,
+      customFields: true,
+      bulkOperations: true
+    }
+  }
+} as const;
+
+// Pasos del onboarding
+export const ONBOARDING_STEPS = [
+  {
+    id: 'welcome',
+    title: '¡Bienvenido a PharmaFlow!',
+    description: 'Conoce las funcionalidades principales de la plataforma',
+    component: 'WelcomeStep',
+    completed: false
+  },
+  {
+    id: 'plan_selection',
+    title: 'Selecciona tu Plan',
+    description: 'Elige el plan que mejor se adapte a tu empresa',
+    component: 'PlanSelectionStep',
+    completed: false
+  },
+  {
+    id: 'company_setup',
+    title: 'Configuración de Empresa',
+    description: 'Configura la información básica de tu empresa',
+    component: 'CompanySetupStep',
+    completed: false
+  },
+  {
+    id: 'first_product',
+    title: 'Primer Producto',
+    description: 'Crea tu primer producto farmacéutico',
+    component: 'FirstProductStep',
+    completed: false,
+    optional: true
+  },
+  {
+    id: 'explore_features',
+    title: 'Explora las Funcionalidades',
+    description: 'Tour guiado por las principales características',
+    component: 'ExploreStep',
+    completed: false
+  }
+] as const; 
