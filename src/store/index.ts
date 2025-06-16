@@ -27,7 +27,7 @@ interface AppState {
   onboarding: OnboardingState;
   setOnboardingStep: (step: number) => void;
   completeOnboardingStep: (stepId: string) => void;
-  showOnboarding: (show: boolean) => void;
+  setShowOnboarding: (show: boolean) => void;
   skipOnboarding: () => void;
   initializeOnboarding: (user: User) => void;
   
@@ -102,7 +102,7 @@ export const useStore = create<AppState>((set, get) => ({
     currentStep: 0,
     totalSteps: ONBOARDING_STEPS.length,
     steps: ONBOARDING_STEPS.map(step => ({ ...step })),
-    showOnboarding: false, // Inicialmente false, se activará según el usuario
+    showOnboarding: true,
     skipAvailable: true
   },
   setOnboardingStep: (step) => set((state) => ({
@@ -116,19 +116,22 @@ export const useStore = create<AppState>((set, get) => ({
       )
     }
   })),
-  showOnboarding: (show) => set((state) => ({
+  setShowOnboarding: (show: boolean) => set((state) => ({
     onboarding: { ...state.onboarding, showOnboarding: show }
   })),
   skipOnboarding: () => set((state) => ({
     onboarding: { ...state.onboarding, showOnboarding: false },
     user: state.user ? { ...state.user, onboardingCompleted: true } : null
   })),
-  initializeOnboarding: (user) => set((state) => ({
-    onboarding: {
+  initializeOnboarding: (user) => set((state) => {
+    const newOnboardingState = {
       ...state.onboarding,
       showOnboarding: !user.onboardingCompleted
-    }
-  })),
+    };
+    return {
+      onboarding: newOnboardingState
+    };
+  }),
   
   // Subscription state
   updateSubscription: (subscriptionUpdate) => set((state) => ({

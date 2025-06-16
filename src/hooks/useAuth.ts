@@ -122,7 +122,7 @@ export const useAuth = () => {
         department: data.company,
         isActive: data.is_active,
         subscription: createEnterpriseTrialSubscription(),
-        onboardingCompleted: false, // Por defecto false para nuevos usuarios
+        onboardingCompleted: data.onboarding_completed || false, // Usar valor de la DB o false por defecto
         trialStartDate: new Date().toISOString()
       }
       
@@ -207,7 +207,7 @@ export const useAuth = () => {
         department: data.company,
         isActive: data.is_active,
         subscription: createEnterpriseTrialSubscription(),
-        onboardingCompleted: false,
+        onboardingCompleted: data.onboarding_completed || false,
         trialStartDate: new Date().toISOString()
       }
       setUser(storeUser)

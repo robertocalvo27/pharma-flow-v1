@@ -14,12 +14,13 @@ export const OnboardingWizard: React.FC = () => {
     onboarding, 
     setOnboardingStep, 
     completeOnboardingStep, 
-    showOnboarding, 
+    setShowOnboarding, 
     skipOnboarding,
     user 
   } = useStore();
 
-  if (!onboarding.showOnboarding || user?.onboardingCompleted) {
+  // Mostrar si hay usuario y el onboarding está habilitado
+  if (!user || !onboarding.showOnboarding) {
     return null;
   }
 
@@ -33,8 +34,7 @@ export const OnboardingWizard: React.FC = () => {
     }
     
     if (isLastStep) {
-      // Completar onboarding
-      showOnboarding(false);
+      setShowOnboarding(false);
     } else {
       setOnboardingStep(onboarding.currentStep + 1);
     }
