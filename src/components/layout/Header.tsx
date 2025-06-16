@@ -12,20 +12,30 @@ export const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      console.log('Logout button clicked');
+      console.log('🔴 Logout button clicked');
       setShowDropdown(false);
       
+      console.log('🔴 Clearing store...');
       // Limpiar el store primero
       setUser(null);
       
+      console.log('🔴 Calling Supabase signOut...');
       // Luego hacer logout en Supabase
-      await signOut();
+      const { error } = await signOut();
       
-      console.log('Logout successful');
+      if (error) {
+        console.error('🔴 Supabase signOut error:', error);
+        throw error;
+      }
+      
+      console.log('🔴 Logout successful, redirecting...');
       // Forzar navegación a login
       window.location.href = '/login';
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('🔴 Error signing out:', error);
+      // Intentar redirección de emergencia
+      console.log('🔴 Emergency redirect to login');
+      window.location.href = '/login';
     }
   };
 
