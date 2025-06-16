@@ -429,6 +429,7 @@ export const mockCalendarEvents: CalendarEvent[] = [
 export const mockDocumentTemplates: DocumentTemplate[] = [
   {
     id: 'template-001',
+    name: 'Solicitud de Registro Sanitario - INVIMA',
     templateName: 'Solicitud de Registro Sanitario - INVIMA',
     description: 'Formato oficial para solicitud de registro sanitario de medicamentos ante INVIMA',
     countryCode: 'CO',
@@ -444,11 +445,14 @@ export const mockDocumentTemplates: DocumentTemplate[] = [
     downloadUrl: '/templates/invima-registro-sanitario-2024.docx',
     previewUrl: '/templates/preview/invima-registro-sanitario-2024.pdf',
     isPopular: true,
+    isFavorite: true,
+    isVerified: true,
     downloadCount: 156,
     tags: ['INVIMA', 'registro sanitario', 'solicitud', 'medicamentos']
   },
   {
     id: 'template-002',
+    name: 'Certificado de Análisis - Formato COFEPRIS',
     templateName: 'Certificado de Análisis - Formato COFEPRIS',
     description: 'Plantilla para certificado de análisis según especificaciones COFEPRIS',
     countryCode: 'MX',
@@ -463,18 +467,21 @@ export const mockDocumentTemplates: DocumentTemplate[] = [
     lastUpdated: '2024-01-10',
     downloadUrl: '/templates/cofepris-certificado-analisis.xlsx',
     isPopular: true,
+    isFavorite: false,
+    isVerified: true,
     downloadCount: 203,
     tags: ['COFEPRIS', 'certificado análisis', 'control calidad', 'especificaciones']
   },
   {
     id: 'template-003',
+    name: 'Relatório de Farmacovigilância - ANVISA',
     templateName: 'Relatório de Farmacovigilância - ANVISA',
     description: 'Modelo para relatório anual de farmacovigilância conforme RDC 4/2009',
     countryCode: 'BR',
     countryName: 'Brasil',
     agencyAcronym: 'ANVISA',
     documentType: 'pharmacovigilance_report',
-    category: 'safety',
+    category: 'pharmacovigilance',
     language: 'pt',
     fileFormat: 'docx',
     fileSize: 178945,
@@ -482,6 +489,8 @@ export const mockDocumentTemplates: DocumentTemplate[] = [
     lastUpdated: '2024-01-08',
     downloadUrl: '/templates/anvisa-relatorio-farmacovigilancia.docx',
     isPopular: false,
+    isFavorite: false,
+    isVerified: true,
     downloadCount: 67,
     tags: ['ANVISA', 'farmacovigilância', 'relatório anual', 'segurança']
   }
@@ -531,6 +540,13 @@ export const mockCountryGuides: CountryGuide[] = [
     countryCode: 'CO',
     countryName: 'Colombia',
     agencyInfo: mockRegulatoryAgencies[0],
+    regulatoryAuthority: 'INVIMA',
+    description: 'Guía completa para el registro de medicamentos en Colombia a través de INVIMA',
+    category: 'registration',
+    difficulty: 'intermediate',
+    estimatedTime: '4-6 meses',
+    estimatedCost: '$3,000 - $8,000 USD',
+    officialUrl: 'https://www.invima.gov.co',
     overview: 'Colombia cuenta con un marco regulatorio robusto para medicamentos, liderado por INVIMA. El proceso de registro sanitario es riguroso pero eficiente, con tiempos promedio de 4-6 meses para medicamentos genéricos.',
     keyRequirements: [
       'Certificado de Buenas Prácticas de Manufactura (BPM)',
@@ -538,6 +554,13 @@ export const mockCountryGuides: CountryGuide[] = [
       'Certificado de Producto Farmacéutico (CPP) del país de origen',
       'Información técnica en formato CTD simplificado',
       'Pago de derechos de evaluación'
+    ],
+    requiredDocuments: [
+      'Formulario de solicitud INVIMA',
+      'Certificado de Libre Venta',
+      'Certificado BPM vigente',
+      'Estudios de estabilidad',
+      'Información técnica del producto'
     ],
     registrationProcess: [
       {
@@ -575,6 +598,17 @@ export const mockCountryGuides: CountryGuide[] = [
         requiredDocuments: [],
         tips: ['Verificar datos en la resolución', 'Solicitar correcciones si es necesario'],
         commonIssues: ['Errores en datos del producto', 'Demoras en expedición']
+      }
+    ],
+    processes: [
+      {
+        stepNumber: 1,
+        title: 'Preparación de Documentación',
+        description: 'Compilar toda la documentación técnica, administrativa y de calidad requerida',
+        estimatedDays: 30,
+        requiredDocuments: ['Formulario de solicitud', 'Información técnica', 'Certificados BPM'],
+        tips: ['Verificar vigencia de certificados', 'Traducir documentos al español'],
+        commonIssues: ['Certificados vencidos', 'Traducciones no oficiales']
       }
     ],
     timelineEstimate: {

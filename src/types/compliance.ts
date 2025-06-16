@@ -133,6 +133,7 @@ export interface CalendarEvent {
 
 export interface DocumentTemplate {
   id: string;
+  name: string;
   templateName: string;
   description: string;
   countryCode: string;
@@ -148,6 +149,8 @@ export interface DocumentTemplate {
   downloadUrl: string;
   previewUrl?: string;
   isPopular: boolean;
+  isFavorite: boolean;
+  isVerified: boolean;
   downloadCount: number;
   tags: string[];
 }
@@ -157,13 +160,22 @@ export interface CountryGuide {
   countryCode: string;
   countryName: string;
   agencyInfo: RegulatoryAgency;
+  regulatoryAuthority: string;
   overview: string;
+  description: string;
+  category: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: string;
+  estimatedCost: string;
   keyRequirements: string[];
+  requiredDocuments?: string[];
   registrationProcess: ProcessStep[];
+  processes?: ProcessStep[];
   timelineEstimate: TimelineEstimate;
   feeStructure: FeeStructure;
   localContacts: LocalContact[];
   recentUpdates: RegulatoryUpdate[];
+  officialUrl?: string;
   lastUpdated: string;
 }
 
