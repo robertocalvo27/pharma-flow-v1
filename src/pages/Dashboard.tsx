@@ -8,7 +8,7 @@ import { useStore } from '../store';
 import { mockProducts, mockWorkflows, mockDashboardStats } from '../data/mockData';
 
 export const Dashboard: React.FC = () => {
-  const { dashboardStats, setDashboardStats, setProducts, setWorkflows } = useStore();
+  const { dashboardStats, setDashboardStats, setProducts, setWorkflows, setShowOnboarding, user, setUser } = useStore();
   
   useEffect(() => {
     // Simulate loading data

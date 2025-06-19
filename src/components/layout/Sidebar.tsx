@@ -26,7 +26,7 @@ const navigation = [
 ];
 
 export const Sidebar: React.FC = () => {
-  const { sidebarOpen, setSidebarOpen } = useStore();
+  const { sidebarOpen, setSidebarOpen, user } = useStore();
   
   return (
     <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-16'}`}>
@@ -77,12 +77,12 @@ export const Sidebar: React.FC = () => {
         <div className="p-4 border-t border-gray-200">
           <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-              MG
+              {user ? user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'MG'}
             </div>
             {sidebarOpen && (
               <div>
-                <p className="text-sm font-medium text-gray-900">Dr. María González</p>
-                <p className="text-xs text-gray-500">Asuntos Regulatorios</p>
+                <p className="text-sm font-medium text-gray-900">{user?.fullName || 'Dr. María González'}</p>
+                <p className="text-xs text-gray-500">{user?.department || 'Asuntos Regulatorios'}</p>
               </div>
             )}
           </div>
