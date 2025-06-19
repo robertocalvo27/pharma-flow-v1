@@ -263,7 +263,7 @@ export const DossierDetailModal: React.FC<DossierDetailModalProps> = ({
       </div>
 
       {/* Contenido de los Tabs */}
-      <div className="min-h-[400px]">
+      <div className={activeTab === 'timeline' ? 'h-96' : 'min-h-[400px]'}>
         {activeTab === 'content' && renderDossierContent()}
         {activeTab === 'timeline' && (
           <DossierTimeline 

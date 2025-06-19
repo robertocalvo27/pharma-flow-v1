@@ -165,9 +165,9 @@ export const DossierTimeline: React.FC<DossierTimelineProps> = ({ dossierId, cou
   };
 
   return (
-    <div className="space-y-4">
-      {/* Header del Timeline */}
-      <div className="mb-6">
+    <div className="h-full flex flex-col">
+      {/* Header del Timeline - Fijo */}
+      <div className="mb-4 flex-shrink-0">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           Timeline de Aprobación - {countryName}
         </h3>
@@ -176,109 +176,114 @@ export const DossierTimeline: React.FC<DossierTimelineProps> = ({ dossierId, cou
         </p>
       </div>
 
-      {/* Timeline Steps */}
-      <div className="relative">
-        {/* Línea vertical del timeline */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-        
-        <div className="space-y-6">
-          {timelineSteps.map((step, index) => (
-            <div key={step.id} className="relative flex items-start">
-              {/* Icono del paso */}
-              <div className="relative z-10 flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-200 rounded-full">
-                {getStatusIcon(step.status)}
-              </div>
+      {/* Contenido con Scroll */}
+      <div className="flex-1 overflow-y-auto max-h-80 pr-2">
+        {/* Timeline Steps */}
+        <div className="relative">
+          {/* Línea vertical del timeline */}
+          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+          
+          <div className="space-y-6">
+            {timelineSteps.map((step, index) => (
+              <div key={step.id} className="relative flex items-start">
+                {/* Icono del paso */}
+                <div className="relative z-10 flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-200 rounded-full flex-shrink-0">
+                  {getStatusIcon(step.status)}
+                </div>
 
-              {/* Contenido del paso */}
-              <div className="ml-6 flex-1">
-                <Card className={`p-4 ${getStepColor(step.status)}`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-medium text-gray-500">
-                          Paso {step.stepNumber}
-                        </span>
-                        {getStatusBadge(step.status)}
+                {/* Contenido del paso */}
+                <div className="ml-6 flex-1 min-w-0">
+                  <Card className={`p-4 ${getStepColor(step.status)}`}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-sm font-medium text-gray-500">
+                            Paso {step.stepNumber}
+                          </span>
+                          {getStatusBadge(step.status)}
+                        </div>
+                        <h4 className="font-semibold text-gray-900 mb-1">
+                          {step.title}
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {step.description}
+                        </p>
                       </div>
-                      <h4 className="font-semibold text-gray-900 mb-1">
-                        {step.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-3">
-                        {step.description}
-                      </p>
                     </div>
-                  </div>
 
-                  {/* Información adicional */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                    {step.assignedTo && (
+                    {/* Información adicional */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                      {step.assignedTo && (
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <span className="text-gray-600 truncate">
+                            <strong>Responsable:</strong> {step.assignedTo}
+                          </span>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
+                        <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
                         <span className="text-gray-600">
-                          <strong>Responsable:</strong> {step.assignedTo}
+                          <strong>Duración:</strong> {step.estimatedDuration}
                         </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="text-gray-600">
+                          <strong>Documentos:</strong> {step.documents}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Fecha de completado */}
+                    {step.completedAt && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <Calendar className="w-4 h-4 flex-shrink-0" />
+                          <span>
+                            Completado el {format(new Date(step.completedAt), 'PPp', { locale: es })}
+                          </span>
+                        </div>
                       </div>
                     )}
-                    
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">
-                        <strong>Duración:</strong> {step.estimatedDuration}
-                      </span>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">
-                        <strong>Documentos:</strong> {step.documents}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Fecha de completado */}
-                  {step.completedAt && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          Completado el {format(new Date(step.completedAt), 'PPp', { locale: es })}
-                        </span>
+                    {/* Notas */}
+                    {step.notes && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-600">
+                          <strong>Notas:</strong> {step.notes}
+                        </p>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Notas */}
-                  {step.notes && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-600">
-                        <strong>Notas:</strong> {step.notes}
-                      </p>
-                    </div>
-                  )}
-                </Card>
+                    )}
+                  </Card>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Resumen del progreso */}
-      <Card className="p-4 bg-blue-50 border border-blue-200 mt-6">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <Clock className="w-4 h-4 text-blue-600" />
-          </div>
-          <div>
-            <h4 className="font-semibold text-blue-900 mb-1">Estado Actual del Proceso</h4>
-            <p className="text-blue-800 text-sm mb-2">
-              El dossier se encuentra actualmente en la fase de desarrollo del producto (Paso 4 de 9).
-            </p>
-            <div className="text-xs text-blue-700">
-              <strong>Tiempo estimado restante:</strong> Aproximadamente 18-20 meses para completar todo el proceso
+      {/* Resumen del progreso - Fijo en la parte inferior */}
+      <div className="mt-4 flex-shrink-0">
+        <Card className="p-4 bg-blue-50 border border-blue-200">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Clock className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="min-w-0">
+              <h4 className="font-semibold text-blue-900 mb-1">Estado Actual del Proceso</h4>
+              <p className="text-blue-800 text-sm mb-2">
+                El dossier se encuentra actualmente en la fase de desarrollo del producto (Paso 4 de 9).
+              </p>
+              <div className="text-xs text-blue-700">
+                <strong>Tiempo estimado restante:</strong> Aproximadamente 18-20 meses para completar todo el proceso
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }; 
