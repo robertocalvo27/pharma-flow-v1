@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, ChevronRight, FileText, Upload, Download, MessageCircle, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, FileText, Upload, Download, MessageCircle, Clock, CheckCircle, AlertCircle, FolderOpen, Activity } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { Dossier, DossierSection } from '../../types';
 import { DOSSIER_SECTIONS } from '../../utils/constants';
+import { DossierTimeline } from './DossierTimeline';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -15,12 +16,15 @@ interface DossierDetailModalProps {
   dossier: Dossier;
 }
 
+type TabType = 'content' | 'timeline';
+
 export const DossierDetailModal: React.FC<DossierDetailModalProps> = ({
   isOpen,
   onClose,
   dossier
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<TabType>('content');
 
   const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections);
@@ -98,6 +102,110 @@ export const DossierDetailModal: React.FC<DossierDetailModalProps> = ({
     };
   });
 
+  const renderTabButton = (tab: TabType, icon: React.ReactNode, label: string) => (
+    <button
+      onClick={() => setActiveTab(tab)}
+      className={`
+        flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
+        ${activeTab === tab 
+          ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+        }
+      `}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+
+  const renderDossierContent = () => (
+    <div className="space-y-3 max-h-96 overflow-y-auto">
+      {completeSections.map((section) => (
+        <Card key={section.id} className="p-0">
+          <div
+            className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => toggleSection(section.id)}
+          >
+            <div className="flex items-center gap-3 flex-1">
+              <div className="flex items-center gap-2">
+                {expandedSections.has(section.id) ? (
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                )}
+                <span className="text-sm font-medium text-gray-500 min-w-[2rem]">
+                  {section.sectionNumber}.
+                </span>
+              </div>
+              {getStatusIcon(section.status)}
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900">{section.sectionName}</h4>
+                <p className="text-sm text-gray-600">{section.description}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500">
+                {section.documents.length} documento{section.documents.length !== 1 ? 's' : ''}
+              </span>
+              {getStatusBadge(section.status)}
+            </div>
+          </div>
+
+          {/* Contenido expandido de la sección */}
+          {expandedSections.has(section.id) && (
+            <div className="border-t border-gray-200 p-4 bg-gray-50">
+              {section.documents.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <FileText className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                  <p className="text-sm">No hay documentos en esta sección</p>
+                  <Button variant="primary" size="sm" className="mt-3">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Subir Documento
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {section.documents.map((document) => (
+                    <div key={document.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-blue-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">{document.fileName}</p>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span>v{document.version}</span>
+                            <span>{formatFileSize(document.fileSize)}</span>
+                            <span>Por {document.uploadedByName}</span>
+                            <span>{format(new Date(document.uploadedAt), 'PPp', { locale: es })}</span>
+                          </div>
+                          {document.notes && (
+                            <p className="text-sm text-gray-600 mt-1">{document.notes}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(document.status as any)}
+                        <Button variant="ghost" size="sm">
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <MessageCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button variant="secondary" size="sm">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Subir Nueva Versión
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl" title={`Dossier - ${dossier.countryName}`} showCloseButton={false}>
       <div className="flex items-center justify-between mb-6">
@@ -146,104 +254,45 @@ export const DossierDetailModal: React.FC<DossierDetailModalProps> = ({
         </div>
       </Card>
 
-      {/* Secciones del Dossier */}
-      <div className="space-y-3 max-h-96 overflow-y-auto">
-        {completeSections.map((section) => (
-          <Card key={section.id} className="p-0">
-            <div
-              className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => toggleSection(section.id)}
-            >
-              <div className="flex items-center gap-3 flex-1">
-                <div className="flex items-center gap-2">
-                  {expandedSections.has(section.id) ? (
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                  )}
-                  <span className="text-sm font-medium text-gray-500 min-w-[2rem]">
-                    {section.sectionNumber}.
-                  </span>
-                </div>
-                {getStatusIcon(section.status)}
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{section.sectionName}</h4>
-                  <p className="text-sm text-gray-600">{section.description}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">
-                  {section.documents.length} documento{section.documents.length !== 1 ? 's' : ''}
-                </span>
-                {getStatusBadge(section.status)}
-              </div>
-            </div>
+      {/* Sistema de Tabs */}
+      <div className="mb-6">
+        <div className="flex gap-2 border-b border-gray-200 pb-4">
+          {renderTabButton('content', <FolderOpen className="w-4 h-4" />, 'Contenido del Dossier')}
+          {renderTabButton('timeline', <Activity className="w-4 h-4" />, 'Timeline de Aprobación')}
+        </div>
+      </div>
 
-            {/* Contenido expandido de la sección */}
-            {expandedSections.has(section.id) && (
-              <div className="border-t border-gray-200 p-4 bg-gray-50">
-                {section.documents.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <FileText className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                    <p className="text-sm">No hay documentos en esta sección</p>
-                    <Button variant="primary" size="sm" className="mt-3">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Subir Documento
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {section.documents.map((document) => (
-                      <div key={document.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-blue-500" />
-                          <div>
-                            <p className="font-medium text-gray-900">{document.fileName}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span>v{document.version}</span>
-                              <span>{formatFileSize(document.fileSize)}</span>
-                              <span>Por {document.uploadedByName}</span>
-                              <span>{format(new Date(document.uploadedAt), 'PPp', { locale: es })}</span>
-                            </div>
-                            {document.notes && (
-                              <p className="text-sm text-gray-600 mt-1">{document.notes}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {getStatusBadge(document.status as any)}
-                          <Button variant="ghost" size="sm">
-                            <Download className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MessageCircle className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    <Button variant="secondary" size="sm">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Subir Nueva Versión
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-        ))}
+      {/* Contenido de los Tabs */}
+      <div className={activeTab === 'timeline' ? 'h-96' : 'min-h-[400px]'}>
+        {activeTab === 'content' && renderDossierContent()}
+        {activeTab === 'timeline' && (
+          <DossierTimeline 
+            dossierId={dossier.id} 
+            countryName={dossier.countryName}
+          />
+        )}
       </div>
 
       {/* Footer */}
       <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
         <div className="text-sm text-gray-500">
-          {completeSections.filter(s => s.status === 'completed').length} de {completeSections.length} secciones completadas
+          {activeTab === 'content' && (
+            <>
+              {completeSections.filter(s => s.status === 'completed').length} de {completeSections.length} secciones completadas
+            </>
+          )}
+          {activeTab === 'timeline' && (
+            <>
+              Proceso de aprobación en curso - Paso 4 de 9 completados
+            </>
+          )}
         </div>
         <div className="flex gap-3">
           <Button variant="secondary" onClick={onClose}>
             Cerrar
           </Button>
           <Button variant="primary">
-            Exportar Dossier
+            {activeTab === 'content' ? 'Exportar Dossier' : 'Exportar Timeline'}
           </Button>
         </div>
       </div>
