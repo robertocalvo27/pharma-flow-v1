@@ -12,20 +12,25 @@ export const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      console.log('Logout button clicked');
       setShowDropdown(false);
       
       // Limpiar el store primero
       setUser(null);
       
       // Luego hacer logout en Supabase
-      await signOut();
+      const { error } = await signOut();
       
-      console.log('Logout successful');
+      if (error) {
+        console.error('Error signing out:', error);
+        throw error;
+      }
+      
       // Forzar navegación a login
       window.location.href = '/login';
     } catch (error) {
       console.error('Error signing out:', error);
+      // Intentar redirección de emergencia
+      window.location.href = '/login';
     }
   };
 
